@@ -21,7 +21,7 @@ type pythonIn struct {
 }
 
 type pythonOut struct {
-	Levene struct {
+	BrownForsythe struct {
 		Statistic float64
 		PValue    float64
 	}
@@ -78,13 +78,13 @@ func TestHolm(t *testing.T) {
 	}
 }
 
-func TestLevene(t *testing.T) {
+func TestBrownForsythe(t *testing.T) {
 	type testcase struct {
 		name string
 		in   pythonIn
 	}
 	cases := make([]testcase, 0)
-	for _, fn := range []string{"Levene", "Welch"} {
+	for _, fn := range []string{"BrownForsythe", "Welch"} {
 		for i := 0; i < 100; i++ {
 			m := rand.Intn(98) + 2
 			samples := make([][]float64, 0, m)
@@ -118,12 +118,12 @@ func TestLevene(t *testing.T) {
 			var statistic, pValue float64
 			var statisticExpected, pValueExpected float64
 			switch tc.in.Func {
-			case "Levene":
+			case "BrownForsythe":
 				for _, sample := range tc.in.Samples {
 					slices.Sort(sample)
 				}
-				statistic, pValue = Levene(tc.in.Samples)
-				statisticExpected, pValueExpected = out.Levene.Statistic, out.Levene.PValue
+				statistic, pValue = BrownForsythe(tc.in.Samples)
+				statisticExpected, pValueExpected = out.BrownForsythe.Statistic, out.BrownForsythe.PValue
 			case "Welch":
 				statistic, pValue = Welch(tc.in.Samples)
 				statisticExpected, pValueExpected = out.Welch.F, out.Welch.PValue

@@ -1,3 +1,4 @@
+// Package stat provides functions for statistical analysis.
 package stat
 
 import (
@@ -78,9 +79,10 @@ func Welch(samples [][]float64) (float64, float64) {
 	return fval, pval
 }
 
-// Levene performs the Brown-Forsythe test of equal variance.
+// BrownForsythe performs the Brown-Forsythe test of equal variance.
+// The input samples are assumed to be already sorted in ascending order.
 // It is ported from the python function scipy.stats.levene.
-func Levene(samples [][]float64) (float64, float64) {
+func BrownForsythe(samples [][]float64) (float64, float64) {
 	k := len(samples)
 	ni := make([]float64, 0, k)
 	yci := make([]float64, 0, k)

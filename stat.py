@@ -1,4 +1,4 @@
-# python stat.py '{"Func": "Levene", "Samples": [[7, 14, 14, 13, 12, 9, 6, 14, 12, 8], [15, 17, 13, 15, 15, 13, 9, 12, 10, 8], [6, 8, 8, 9, 5, 14, 13, 8, 10, 9]]}'
+# python stat.py '{"Func": "BrownForsythe", "Samples": [[7, 14, 14, 13, 12, 9, 6, 14, 12, 8], [15, 17, 13, 15, 15, 13, 9, 12, 10, 8], [6, 8, 8, 9, 5, 14, 13, 8, 10, 9]]}'
 import collections
 import logging
 import json
@@ -129,10 +129,10 @@ def main():
     lg.handlers[0].setFormatter(logging.Formatter("%(asctime)s.%(msecs)03d %(pathname)s:%(lineno)d %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
 
     cfg = json.loads(sys.argv[1])
-    if cfg["Func"] == "Levene":
+    if cfg["Func"] == "BrownForsythe":
         scipyOut = stats.levene(*cfg["Samples"])
         # scipyOut = levene(*cfg["Samples"])
-        out = {"Levene": {"Statistic": scipyOut.statistic, "PValue": scipyOut.pvalue}}
+        out = {"BrownForsythe": {"Statistic": scipyOut.statistic, "PValue": scipyOut.pvalue}}
     elif cfg["Func"] == "Welch":
         global pd, pingouin
         import pandas as pd
