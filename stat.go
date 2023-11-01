@@ -90,7 +90,7 @@ func BrownForsythe(samples [][]float64) (float64, float64) {
 	for j := 0; j < k; j++ {
 		nij := float64(len(samples[j]))
 		ni = append(ni, nij)
-		yci = append(yci, Median(samples[j]))
+		yci = append(yci, QuantileF(samples[j], 0.5))
 		ntot += nij
 	}
 	// log.Printf("k: %d, ni: %v, yci: %v, ntot: %f", k, ni, yci, ntot)
@@ -145,11 +145,47 @@ func sf(x, dfn, dfd float64) float64 {
 	return f.Survival(x)
 }
 
-// Median returns the median of a sample.
-func Median(sample []float64) float64 {
-	size := len(sample)
-	if size%2 == 1 {
-		return sample[size/2]
+// Mean returns the mean of a sample
+func Mean[S ~[]E, E any](sample S, get func(E) float64) float64 {
+	var m float64
+	for i, d := range sample {
+		m += (get(d) - m) / float64(i+1)
 	}
-	return (sample[size/2-1] + sample[size/2]) / 2
+	return m
+}
+
+// SS returns the mean and sum of squares of a sample.
+func SS[S ~[]E, E any](sample S, get func(E) float64) (float64, float64) {
+	mean, M2 := 0.0, 0.0
+	for n, d := range sample {
+		x := get(d)
+		delta := x - mean
+		mean += delta / float64(n+1)
+		M2 += delta * (x - mean)
+	}
+	return mean, M2
+}
+
+// Quantile returns the q-quantile of a sample.
+// The sample is assumed to be already sorted.
+// It uses the R8 method described in https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm.
+func Quantile[S ~[]E, E any](sample S, get func(E) float64, q float64) float64 {
+	N := float64(len(sample))
+	n := 1/3.0 + q*(N+1/3.0)
+
+	kf, frac := math.Modf(n)
+	k := int(kf)
+	if k <= 0 {
+		return get(sample[0])
+	} else if k >= len(sample) {
+		return get(sample[len(sample)-1])
+	}
+
+	return get(sample[k-1]) + frac*(get(sample[k])-get(sample[k-1]))
+}
+
+// QuantileF returns the q-quantile of a sample of float64s.
+// The sample is assumed to be already sorted.
+func QuantileF(sample []float64, q float64) float64 {
+	return Quantile(sample, func(f float64) float64 { return f }, q)
 }

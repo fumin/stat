@@ -15,6 +15,27 @@ import (
 	"github.com/pkg/errors"
 )
 
+func TestMean(t *testing.T) {
+	sample := []float64{0.4, 3.6, 4.5, 5.0, 7.5}
+	expected := 4.2
+	mean := Mean(sample, func(f float64) float64 { return f })
+	if mean != expected {
+		t.Fatalf("%f %f", mean, expected)
+	}
+}
+
+func TestSS(t *testing.T) {
+	sample := []float64{0.6, 0.47, 0.17, 0.43, 0.3}
+	expectedMean, expectedSS := 0.394, 0.10852
+	mean, ss := SS(sample, func(f float64) float64 { return f })
+	if math.Abs(mean-expectedMean) > 1e-6 {
+		t.Fatalf("%f %f", mean, expectedMean)
+	}
+	if math.Abs(ss-expectedSS) > 1e-6 {
+		t.Fatalf("%f %f", ss, expectedSS)
+	}
+}
+
 type pythonIn struct {
 	Func    string
 	Samples [][]float64
